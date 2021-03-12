@@ -47,9 +47,11 @@ def basket_pricer(basket: Basket, prices: Catalogue, offers: List[Offer]):
         best_discount, best_offer_items = max(nonempty_offer_tuples, key=lambda x: x[0])
         if not best_offer_items:
             break
+        discount_cnt = 0
         while undiscounted_basket_items & best_offer_items == best_offer_items:
-            discount += best_discount
+            discount_cnt += 1
             undiscounted_basket_items -= best_offer_items
+        discount += discount_cnt * best_discount
 
     sub_total_rounded = round_half_up(sub_total)
     discount_rounded = round_half_up(discount)
