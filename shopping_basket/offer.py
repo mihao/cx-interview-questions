@@ -36,7 +36,7 @@ class BuyXgetY(Offer):
         self.get_cnt = get_cnt
 
     def is_applicable(self, basket: Basket) -> bool:
-        return basket[self.item] >= self.buy_cnt
+        return basket[self.item] > self.buy_cnt
 
     def select_items(self, basket: Basket) -> Basket:
         return Basket({self.item: self.buy_cnt + self.get_cnt})
