@@ -35,8 +35,10 @@ def _get_discount_and_offer_items(
         )
         offer_items = Basket(sorted_items[:products_per_offer])
     discount = offer.calculate_discount(offer_items, prices)
+    if discount < 0:
+        raise ValueError("discount cannot be negative")
     if discount > sum(prices[item] for item in offer_items.elements()):
-        raise ValueError("discount is larger than the value of the items")
+        raise ValueError("discount cannot be larger than the value of the items")
     return (discount, offer_items)
 
 
@@ -83,6 +85,9 @@ def basket_pricer(basket: Basket, prices: Catalogue, offers: List[Offer]):
     Returned value:
     tuple containing three floats: sub-total, discount and the total discounted price
     """
+
+    if any(value < 0 for value in prices.values()):
+        raise ValueError("catalogue prices cannot be negative")
 
     try:
         sub_total = sum(prices[item] for item in basket.elements())

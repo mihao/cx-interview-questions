@@ -46,6 +46,17 @@ class Broken2(Offer):
         return 999
 
 
+class Broken3(Offer):
+    def is_applicable(self, basket):
+        return True
+
+    def select_items(self, basket):
+        return basket
+
+    def calculate_discount(self, offer_items, prices):
+        return -999
+
+
 class TestBasketPricer(unittest.TestCase):
     def testBuyXgetY(self):
         basket = Basket({"Baked Beans": 4, "Biscuits": 1})
@@ -65,16 +76,31 @@ class TestBasketPricer(unittest.TestCase):
         )
         self.assertEqual(basket_pricer(basket, catalogue, offers), (17.0, 5.5, 11.5))
 
-    def testBrokenOffers1(self):
+    def testBrokenOffersZeroDiscount(self):
         basket = Basket({"Baked Beans": 1, "Biscuits": 2, "Sardines": 3})
         self.assertEqual(
             basket_pricer(basket, catalogue, [Broken1()]), (9.06, 0.0, 9.06)
         )
 
-    def testBrokenOffers2(self):
+    def testBrokenOfferDiscountTooLarge(self):
         basket = Basket({"Baked Beans": 1, "Biscuits": 2, "Sardines": 3})
         with self.assertRaises(ValueError):
             basket_pricer(basket, catalogue, [Broken2()])
+
+    def testBrokenOfferNegativeDiscount(self):
+        basket = Basket({"Baked Beans": 1, "Biscuits": 2, "Sardines": 3})
+        with self.assertRaises(ValueError):
+            basket_pricer(basket, catalogue, [Broken3()])
+
+    def testEmptyCatalogue(self):
+        basket = Basket({"item": 1})
+        with self.assertRaises(ValueError):
+            basket_pricer(basket, Catalogue({}), [Broken3()])
+
+    def testNegativePrice(self):
+        basket = Basket({"item": 1})
+        with self.assertRaises(ValueError):
+            basket_pricer(basket, Catalogue({"item": -1}), [Broken3()])
 
     def testItemNotInCatalogue(self):
         basket = Basket({"qwerty": 1})
